@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "hexlet-code"
+version = "0.1.0"
+description = "Page analyzer"
+authors = ["Rust <afarg1710@gmail.com>"]
+classifiers = [
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Programming Language :: Python :: 3.10"
+]
+readme = "README.md"
+packages = [{include = "page_analyzer"}, {include = "tests"},]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+lint = "^1.2.1"
+flask = "^3.0.3"
+gunicorn = "^23.0.0"
+psycopg2-binary = "^2.9.10"
+pip = "^24.3.1"
+python-dotenv = "^1.0.1"
+flake8 = "^7.1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
