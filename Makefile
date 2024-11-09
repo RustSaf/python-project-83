@@ -17,8 +17,8 @@ check: selfcheck test lint
 
 #build: check
 #	poetry build
-build:
-      ./build.sh
+#build:
+#	./build.sh
 
 publish:
 	poetry publish --dry-run

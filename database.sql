@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL GENERATED ALWAYS AS IDENTITY,
+    code VARCHAR(255) NOT NULL,
+    h1 VARCHAR(255),
+    title VARCHAR(255) NOT NULL,
+    descriptino VARCHAR(255),
+    data date NOT NULL
+);
