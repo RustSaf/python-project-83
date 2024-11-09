@@ -46,5 +46,5 @@ start:
 	build
 	publish
 	package-install
-        start
-        dev
+	start
+	dev
