@@ -30,7 +30,7 @@ package-install:
 #	poetry run flask --app example --debug run --port 8000
 
 dev:
-	poetry run flask --app page_analyzer:app run
+	poetry run flask --app page_analyzer:app run --debug
 
 PORT ?= 8000
 start:

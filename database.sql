@@ -1,8 +1,15 @@
-CREATE TABLE IF NOT EXISTS users (
-    id SERIAL GENERATED ALWAYS AS IDENTITY,
-    code VARCHAR(255) NOT NULL,
+CREATE TABLE IF NOT EXISTS urls (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    created_at DATE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS url_checks (
+    id SERIAL PRIMARY KEY,
+    url_id SERIAL REFERENCES urls(id),
+    status_code INT,
     h1 VARCHAR(255),
-    title VARCHAR(255) NOT NULL,
-    descriptino VARCHAR(255),
-    data date NOT NULL
+    title VARCHAR(255),
+    description TEXT,
+    created_at DATE DEFAULT CURRENT_TIMESTAMP
 );
