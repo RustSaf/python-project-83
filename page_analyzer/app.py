@@ -30,10 +30,10 @@ except ModuleNotFounfError:
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-#DATABASE_URL = os.getenv('DATABASE_URL')
-app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
+DATABASE_URL = os.getenv('DATABASE_URL')
+#app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 
-conn = psycopg2.connect(app.config['DATABASE_URL'])
+conn = psycopg2.connect(DATABASE_URL)
 repo_url = UrlRepository(conn)
 repo_check = CheckRepository(conn)
 
