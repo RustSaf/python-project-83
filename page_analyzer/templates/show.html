@@ -38,7 +38,8 @@
   <div class="table-responsive">
     <table class="table table-bordered table-hover text-nowrap" data-test="url">
       <tbody>
-        <tr>
+        {% if urls %}
+        <tr>  
           <td>ID</td>
           <td>{{ url.id }}</td>
         </tr>
@@ -50,6 +51,7 @@
           <td>Дата создания</td>
           <td>{{ url.created_at }}</td>
         </tr>
+        {% endif %}
       </tbody>
     </table>
   </div>
@@ -72,6 +74,7 @@
       </tr>
     </thead>
     <tbody>
+      {% if checks %}
       {% for check in checks %}    
       <tr>
           <td>{{ check.id }}</td>
@@ -82,6 +85,7 @@
           <td>{{ check.created_at }}</td>
       </tr>
       {% endfor %}
+      {% endif %}
     </tbody>
     </table>
   </div>

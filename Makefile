@@ -8,7 +8,7 @@ test:
 #	poetry run pytest --cov=gendiff --cov-report xml
 
 lint:
-	poetry run flake8 app
+	poetry run flake8 page_analyzer/app.py
 
 selfcheck:
 	poetry check

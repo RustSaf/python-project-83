@@ -24,21 +24,22 @@ try:
     from dotenv import load_dotenv
 
     load_dotenv('.env.dev')
-except ModuleNotFounfError:
+except ModuleNotFoundError:
     pass
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 DATABASE_URL = os.getenv('DATABASE_URL')
-#app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
+app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
+print(DATABASE_URL)
 
 conn = psycopg2.connect(DATABASE_URL)
 repo_url = UrlRepository(conn)
 repo_check = CheckRepository(conn)
 
-#@app.route('/')
-#def urls_index():
+# @app.route('/')
+# def urls_index():
 #    term = request.args.get('query')
 #    if term:
 #        users = repo.get_by_term(search_term=term)
@@ -54,9 +55,9 @@ def url_new():
 
 @app.route('/urls')
 def urls_get_all():
-    #url_repo_all = repo_url.get_content()
-    #check_repo_all = repo_check.get_content()
-    url_check_repo_all=repo_url.get_content_with_last_date()
+    # url_repo_all = repo_url.get_content()
+    # check_repo_all = repo_check.get_content()
+    url_check_repo_all = repo_url.get_content_with_last_date()
     return render_template(
         'view.html',
         urls=url_check_repo_all
@@ -94,15 +95,13 @@ def urls_get(id):
     return render_template(
         'show.html',
         url=url,
-        checks=checks,
-#        messages=messages
+        checks=checks
     )
 
 
 @app.route('/urls/<int:id>/checks', methods=['POST'])
 def urls_check(id):
     repo_check.save(id)
-    
 #    url = repo_url.find_id(id)
 #    print(checks)
     flash('Страница успешно проверена', 'success')
@@ -111,6 +110,6 @@ def urls_check(id):
 #    return render_template(
 #        'show.html',
 #        url=url,
-#        checks=checks
+#        checks=checks,
 #        messages=messages
 #    ), 302
