@@ -16,6 +16,8 @@ import validators
 
 from urllib.parse import urlparse
 
+import requests
+
 from page_analyzer.url_repository import UrlRepository
 
 from page_analyzer.check_repository import CheckRepository
@@ -82,7 +84,7 @@ def urls_post():
         else:
             id = url_repo['id']
             flash('Страница уже существует', 'exists')
-            return redirect(f'urls/{id}'), 302
+            return redirect(f'/urls/{id}'), 302
     else:
         flash('Некорректный URL', 'error')
         return render_template('index.html', url=input_url), 422
@@ -105,11 +107,24 @@ def urls_get(id):
 
 @app.route('/urls/<int:id>/checks', methods=['POST'])
 def urls_check(id):
-    repo_check.save(id)
+    url = repo_url.find_id(id)['name']
+    try:
+        r = requests.get(url)
+        if r.raise_for_status() != 'HTTPError':
+            url_code = r.status_code
+            repo_check.save(id, url_code)
+            flash('Страница успешно проверена', 'success')
+            return redirect(f'/urls/{id}'), 302
+        else:
+#         id = url_repo['id']
+            flash('Произошла ошибка при проверке', 'error')
+            return redirect(f'/urls/{id}'), 302
+    except requests.exceptions.ConnectionError:
+#         id = url_repo['id']
+        flash('Произошла ошибка при проверке', 'error')
+        return redirect(f'/urls/{id}'), 302
 #    url = repo_url.find_id(id)
 #    print(checks)
-    flash('Страница успешно проверена', 'success')
-    return redirect(f'/urls/{id}'), 302
 #    return redirect(f'urls/{id}'), 302
 #    return render_template(
 #        'show.html',

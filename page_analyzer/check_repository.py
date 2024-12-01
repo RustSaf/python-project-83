@@ -59,11 +59,11 @@ class CheckRepository:
 #                (urls['name'], urls['created_at'], urls['id'])
 #            )
 #        self.conn.commit()
-    def save(self, url_id):
+    def save(self, url_id, url_code):
         with self.conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO url_checks (url_id) VALUES (%s) RETURNING id",
-                (url_id, )
+                "INSERT INTO url_checks (url_id, status_code) VALUES (%s, %s) RETURNING id",
+                (url_id, url_code)
             )
             id = cur.fetchone()[0]
         self.conn.commit()
