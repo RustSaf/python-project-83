@@ -25,19 +25,21 @@ from page_analyzer.check_repository import CheckRepository
 try:
     from dotenv import load_dotenv
 
-    load_dotenv('.env.dev')
+    load_dotenv()
+#    load_dotenv('.env.dev')
+
 except ModuleNotFoundError:
     pass
 
 
 app = Flask(__name__)
-#app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-#DATABASE_URL = os.getenv('DATABASE_URL')
-#app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+DATABASE_URL = os.getenv('DATABASE_URL')
+app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 #print(DATABASE_URL)
-DATABASE_URL = os.environ.get('DATABASE_URL')
-app.config['DATABASE_URL'] = os.environ.get('DATABASE_URL')
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+#DATABASE_URL = os.environ.get('DATABASE_URL')
+#app.config['DATABASE_URL'] = os.environ.get('DATABASE_URL')
+#app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 
 conn = psycopg2.connect(DATABASE_URL)
@@ -110,17 +112,19 @@ def urls_check(id):
     url = repo_url.find_id(id)['name']
     try:
         r = requests.get(url)
-        if r.raise_for_status() != 'HTTPError':
+#        print(r.raise_for_status())
+#        if r.raise_for_status() is None:
+        if r.status_code == requests.codes.ok:
             url_code = r.status_code
             repo_check.save(id, url_code)
             flash('Страница успешно проверена', 'success')
             return redirect(f'/urls/{id}'), 302
         else:
-#         id = url_repo['id']
             flash('Произошла ошибка при проверке', 'error')
-            return redirect(f'/urls/{id}'), 302
-    except requests.exceptions.ConnectionError:
-#         id = url_repo['id']
+            return redirect(f'/urls/{id}'), 302 
+#       id = url_repo['id']
+    except requests.exceptions.ConnectionError:         
+#        id = url_repo['id']
         flash('Произошла ошибка при проверке', 'error')
         return redirect(f'/urls/{id}'), 302
 #    url = repo_url.find_id(id)
