@@ -4,9 +4,6 @@ install:
 test:
 	poetry run pytest
 
-#test-coverage:
-#	poetry run pytest --cov=gendiff --cov-report xml
-
 lint:
 	poetry run flake8 page_analyzer/app.py
 
@@ -15,8 +12,6 @@ selfcheck:
 
 check: selfcheck test lint
 
-#build: check
-#	poetry build
 build:
 	./build.sh
 
@@ -25,9 +20,6 @@ publish:
 
 package-install:
 	python3 -m pip install --user dist/*.whl
-
-#start:
-#	poetry run flask --app example --debug run --port 8000
 
 dev:
 	poetry run flask --app page_analyzer:app run --debug

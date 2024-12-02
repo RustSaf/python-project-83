@@ -1,7 +1,6 @@
 import os
 
 from flask import (
-    get_flashed_messages,
     flash,
     Flask,
     redirect,
@@ -18,6 +17,8 @@ from urllib.parse import urlparse
 
 import requests
 
+from bs4 import BeautifulSoup
+
 from page_analyzer.url_repository import UrlRepository
 
 from page_analyzer.check_repository import CheckRepository
@@ -26,7 +27,6 @@ try:
     from dotenv import load_dotenv
 
     load_dotenv()
-#    load_dotenv('.env.dev')
 
 except ModuleNotFoundError:
     pass
@@ -36,24 +36,10 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 DATABASE_URL = os.getenv('DATABASE_URL')
 app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
-#print(DATABASE_URL)
-#DATABASE_URL = os.environ.get('DATABASE_URL')
-#app.config['DATABASE_URL'] = os.environ.get('DATABASE_URL')
-#app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-
 
 conn = psycopg2.connect(DATABASE_URL)
 repo_url = UrlRepository(conn)
 repo_check = CheckRepository(conn)
-
-# @app.route('/')
-# def urls_index():
-#    term = request.args.get('query')
-#    if term:
-#        users = repo.get_by_term(search_term=term)
-#    else:
-#        users = repo.get_content()
-#    return render_template('users/index.html', search=term, users=users)
 
 
 @app.get('/')
@@ -63,8 +49,6 @@ def url_new():
 
 @app.route('/urls')
 def urls_get_all():
-    # url_repo_all = repo_url.get_content()
-    # check_repo_all = repo_check.get_content()
     url_check_repo_all = repo_url.get_content_with_last_date()
     return render_template(
         'view.html',
@@ -96,10 +80,6 @@ def urls_post():
 def urls_get(id):
     url = repo_url.find_id(id)
     checks = repo_check.find_id(id)
-#    url_repo_all = repo_url.get_content()
-#    checks = repo_check.find_id(id)
-#    messages = get_flashed_messages(with_categories='True')
-#    print(messages)
     return render_template(
         'show.html',
         url=url,
@@ -112,27 +92,19 @@ def urls_check(id):
     url = repo_url.find_id(id)['name']
     try:
         r = requests.get(url)
-#        print(r.raise_for_status())
-#        if r.raise_for_status() is None:
         if r.status_code == requests.codes.ok:
             url_code = r.status_code
-            repo_check.save(id, url_code)
+            bs = BeautifulSoup(r.text, "lxml")
+            h1 = bs.find('h1').string if bs.find('h1') else ''
+            title = bs.find('title').string if bs.find('title') else ''
+            meta = bs.find('meta', {"name": "description"})
+            description = meta.attrs.get('content', '') if meta else ''
+            repo_check.save(id, url_code, h1, title, description)
             flash('Страница успешно проверена', 'success')
             return redirect(f'/urls/{id}'), 302
         else:
             flash('Произошла ошибка при проверке', 'error')
-            return redirect(f'/urls/{id}'), 302 
-#       id = url_repo['id']
-    except requests.exceptions.ConnectionError:         
-#        id = url_repo['id']
+            return redirect(f'/urls/{id}'), 302
+    except requests.exceptions.ConnectionError:
         flash('Произошла ошибка при проверке', 'error')
         return redirect(f'/urls/{id}'), 302
-#    url = repo_url.find_id(id)
-#    print(checks)
-#    return redirect(f'urls/{id}'), 302
-#    return render_template(
-#        'show.html',
-#        url=url,
-#        checks=checks,
-#        messages=messages
-#    ), 302
