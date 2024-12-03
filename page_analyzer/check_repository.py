@@ -31,8 +31,8 @@ class CheckRepository:
     def save(self, url_id, url_code, h1, title, description):
         with self.conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO url_checks (url_id, status_code, h1, title, description) VALUES (%s, %s, %s, %s, %s) RETURNING id",
-                (url_id, url_code, h1, title, description)
+                "INSERT INTO url_checks (url_id, status_code, h1, title, description, created_at) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
+                (url_id, url_code, h1, title, description, date.today())
             )
             id = cur.fetchone()[0]
         self.conn.commit()

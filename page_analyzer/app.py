@@ -66,14 +66,15 @@ def urls_post():
         if url_repo is None:
             id = repo_url.save(norm_url)
             flash('Страница успешно добавлена', 'success')
-            return redirect(f'urls/{id}'), 302
+            return redirect(url_for('urls_get', id=id)), 302
         else:
             id = url_repo['id']
             flash('Страница уже существует', 'exists')
-            return redirect(f'/urls/{id}'), 302
+            return redirect(url_for('urls_get', id=id)), 302
     else:
         flash('Некорректный URL', 'error')
-        return render_template('index.html', url=input_url), 422
+        return redirect(url_for('url_new')), 303
+    
 
 
 @app.route('/urls/<int:id>')
@@ -101,10 +102,10 @@ def urls_check(id):
             description = meta.attrs.get('content', '') if meta else ''
             repo_check.save(id, url_code, h1, title, description)
             flash('Страница успешно проверена', 'success')
-            return redirect(f'/urls/{id}'), 302
+            return redirect(url_for('urls_get', id=id)), 302
         else:
             flash('Произошла ошибка при проверке', 'error')
-            return redirect(f'/urls/{id}'), 302
+            return redirect(url_for('urls_get', id=id)), 303
     except requests.exceptions.ConnectionError:
         flash('Произошла ошибка при проверке', 'error')
-        return redirect(f'/urls/{id}'), 302
+        return redirect(url_for('urls_get', id=id)), 303
