@@ -74,7 +74,6 @@ def urls_post():
     else:
         flash('Некорректный URL', 'error')
         return redirect(url_for('url_new')), 303
-    
 
 
 @app.route('/urls/<int:id>')
