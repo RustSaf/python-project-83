@@ -1,8 +1,12 @@
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ModuleNotFoundError:
-    pass
+#try:
+#    from dotenv import load_dotenv
+#    load_dotenv()
+#except ModuleNotFoundError:
+#    pass
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 import os
 
