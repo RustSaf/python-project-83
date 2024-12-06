@@ -1,3 +1,9 @@
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ModuleNotFoundError:
+    pass
+
 import os
 
 from flask import (
@@ -22,15 +28,6 @@ from bs4 import BeautifulSoup
 from page_analyzer.url_repository import UrlRepository
 
 from page_analyzer.check_repository import CheckRepository
-
-try:
-    from dotenv import load_dotenv
-
-    load_dotenv()
-
-except ModuleNotFoundError:
-    pass
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
