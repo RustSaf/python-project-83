@@ -1,42 +1,27 @@
-#try:
+# try:
 #    from dotenv import load_dotenv
 #    load_dotenv()
-#except ModuleNotFoundError:
+# except ModuleNotFoundError:
 #    pass
-
-from dotenv import load_dotenv
-
-load_dotenv()
-
 import os
-
-from flask import (
-    flash,
-    Flask,
-    redirect,
-    render_template,
-    request,
-    url_for
-)
-
-import psycopg2
-
-import validators
-
 from urllib.parse import urlparse
 
+import psycopg2
 import requests
-
+import validators
 from bs4 import BeautifulSoup
-
-from page_analyzer.url_repository import UrlRepository
+from dotenv import load_dotenv
+from flask import Flask, flash, redirect, render_template, request, url_for
 
 from page_analyzer.check_repository import CheckRepository
+from page_analyzer.url_repository import UrlRepository
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 DATABASE_URL = os.getenv('DATABASE_URL')
-#app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
+# app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 
 conn = psycopg2.connect(DATABASE_URL)
 repo_url = UrlRepository(conn)

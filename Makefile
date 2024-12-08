@@ -5,7 +5,10 @@ test:
 	poetry run pytest
 
 lint:
-	poetry run flake8 page_analyzer/app.py
+	poetry run flake8 page_analyzer
+
+ruff:
+	poetry run ruff check
 
 selfcheck:
 	poetry check
