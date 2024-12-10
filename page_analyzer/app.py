@@ -46,11 +46,11 @@ def urls_post():
         if url_repo is None:
             id = repo_url.save(norm_url)
             flash('Страница успешно добавлена', 'success')
-            return redirect(url_for('urls_get', id=id)), 302
+            return redirect(url_for('urls_get', id=id))
         else:
             id = url_repo['id']
             flash('Страница уже существует', 'exists')
-            return redirect(url_for('urls_get', id=id)), 302
+            return redirect(url_for('urls_get', id=id))
     else:
         flash('Некорректный URL', 'error')
         return redirect(url_for('url_new'))
@@ -87,7 +87,7 @@ def urls_check(id):
             repo_check = CheckRepository(conn)
             repo_check.save(id, url_code, h1, title, description)
             flash('Страница успешно проверена', 'success')
-            return redirect(url_for('urls_get', id=id)), 302
+            return redirect(url_for('urls_get', id=id))
         else:
             flash('Произошла ошибка при проверке', 'error')
             return redirect(url_for('urls_get', id=id))
