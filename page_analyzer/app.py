@@ -1,8 +1,3 @@
-# try:
-#    from dotenv import load_dotenv
-#    load_dotenv()
-# except ModuleNotFoundError:
-#    pass
 import os
 from urllib.parse import urlparse
 
@@ -21,11 +16,10 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 DATABASE_URL = os.getenv('DATABASE_URL')
-# app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 
-conn = psycopg2.connect(DATABASE_URL)
-repo_url = UrlRepository(conn)
-repo_check = CheckRepository(conn)
+#conn = psycopg2.connect(DATABASE_URL)
+#repo_url = UrlRepository(conn)
+#repo_check = CheckRepository(conn)
 
 
 @app.get('/')
@@ -35,6 +29,8 @@ def url_new():
 
 @app.route('/urls')
 def urls_get_all():
+    conn = psycopg2.connect(DATABASE_URL)
+    repo_url = UrlRepository(conn)
     url_check_repo_all = repo_url.get_content_with_last_date()
     return render_template(
         'view.html',
@@ -48,6 +44,8 @@ def urls_post():
     if validators.url(input_url):
         parsed_url = urlparse(input_url)
         norm_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+        conn = psycopg2.connect(DATABASE_URL)
+        repo_url = UrlRepository(conn)
         url_repo = repo_url.find_name(norm_url)
         if url_repo is None:
             id = repo_url.save(norm_url)
@@ -64,6 +62,9 @@ def urls_post():
 
 @app.route('/urls/<int:id>')
 def urls_get(id):
+    conn = psycopg2.connect(DATABASE_URL)
+    repo_url = UrlRepository(conn)
+    repo_check = CheckRepository(conn)
     url = repo_url.find_id(id)
     checks = repo_check.find_id(id)
     return render_template(
@@ -75,6 +76,8 @@ def urls_get(id):
 
 @app.route('/urls/<int:id>/checks', methods=['POST'])
 def urls_check(id):
+    conn = psycopg2.connect(DATABASE_URL)
+    repo_url = UrlRepository(conn)
     url = repo_url.find_id(id)['name']
     try:
         r = requests.get(url)
@@ -85,6 +88,7 @@ def urls_check(id):
             title = bs.find('title').string if bs.find('title') else ''
             meta = bs.find('meta', {"name": "description"})
             description = meta.attrs.get('content', '') if meta else ''
+            repo_check = CheckRepository(conn)
             repo_check.save(id, url_code, h1, title, description)
             flash('Страница успешно проверена', 'success')
             return redirect(url_for('urls_get', id=id)), 302
