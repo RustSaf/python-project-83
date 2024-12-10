@@ -17,10 +17,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-#conn = psycopg2.connect(DATABASE_URL)
-#repo_url = UrlRepository(conn)
-#repo_check = CheckRepository(conn)
-
 
 @app.get('/')
 def url_new():
@@ -57,7 +53,7 @@ def urls_post():
             return redirect(url_for('urls_get', id=id)), 302
     else:
         flash('Некорректный URL', 'error')
-        return redirect(url_for('url_new')), 303
+        return redirect(url_for('url_new'))
 
 
 @app.route('/urls/<int:id>')
@@ -94,7 +90,7 @@ def urls_check(id):
             return redirect(url_for('urls_get', id=id)), 302
         else:
             flash('Произошла ошибка при проверке', 'error')
-            return redirect(url_for('urls_get', id=id)), 303
+            return redirect(url_for('urls_get', id=id))
     except requests.exceptions.ConnectionError:
         flash('Произошла ошибка при проверке', 'error')
-        return redirect(url_for('urls_get', id=id)), 303
+        return redirect(url_for('urls_get', id=id))
