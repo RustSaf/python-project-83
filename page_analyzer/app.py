@@ -20,7 +20,7 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 
 @app.get('/')
 def url_new():
-    return render_template('index.html', url='', messages=''), 200
+    return render_template('index.html', url=''), 200
 
 
 @app.route('/urls')
@@ -53,7 +53,7 @@ def urls_post():
             return redirect(url_for('urls_get', id=id), 302)
     else:
         flash('Некорректный URL', 'error')
-        return redirect(url_for('url_new'), 422)
+        return render_template('index.html', url=input_url), 422
 
 
 @app.route('/urls/<int:id>')
