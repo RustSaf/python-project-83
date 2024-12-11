@@ -20,7 +20,7 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 
 @app.get('/')
 def url_new():
-    return render_template('index.html', url='', messages='')
+    return render_template('index.html', url='', messages=''), 200
 
 
 @app.route('/urls')
@@ -31,7 +31,7 @@ def urls_get_all():
     return render_template(
         'view.html',
         urls=url_check_repo_all
-    )
+    ), 200
 
 
 @app.route('/urls', methods=['POST'])
@@ -46,14 +46,14 @@ def urls_post():
         if url_repo is None:
             id = repo_url.save(norm_url)
             flash('Страница успешно добавлена', 'success')
-            return redirect(url_for('urls_get', id=id))
+            return redirect(url_for('urls_get', id=id), 302)
         else:
             id = url_repo['id']
             flash('Страница уже существует', 'exists')
-            return redirect(url_for('urls_get', id=id))
+            return redirect(url_for('urls_get', id=id), 302)
     else:
         flash('Некорректный URL', 'error')
-        return redirect(url_for('url_new'))
+        return redirect(url_for('url_new'), 302)
 
 
 @app.route('/urls/<int:id>')
@@ -67,7 +67,7 @@ def urls_get(id):
         'show.html',
         url=url,
         checks=checks
-    )
+    ), 200
 
 
 @app.route('/urls/<int:id>/checks', methods=['POST'])
@@ -87,10 +87,10 @@ def urls_check(id):
             repo_check = CheckRepository(conn)
             repo_check.save(id, url_code, h1, title, description)
             flash('Страница успешно проверена', 'success')
-            return redirect(url_for('urls_get', id=id))
+            return redirect(url_for('urls_get', id=id), 302)
         else:
             flash('Произошла ошибка при проверке', 'error')
-            return redirect(url_for('urls_get', id=id))
+            return redirect(url_for('urls_get', id=id), 302)
     except requests.exceptions.ConnectionError:
         flash('Произошла ошибка при проверке', 'error')
-        return redirect(url_for('urls_get', id=id))
+        return redirect(url_for('urls_get', id=id), 302)
