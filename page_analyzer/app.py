@@ -8,18 +8,17 @@ from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for
 
 from page_analyzer.check_repository import CheckRepository
-from page_analyzer.db import conn
+from page_analyzer.db import get_connection
 from page_analyzer.url_repository import UrlRepository
 
 load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-DATABASE_URL = os.getenv('DATABASE_URL')
-app.config['DATABASE_URL'] = DATABASE_URL
+app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 
 
-def analyzer(url, id):
+def analyzer(url):
     try:
         r = requests.get(url)
         if r.status_code == requests.codes.ok:
@@ -29,16 +28,16 @@ def analyzer(url, id):
             title = bs.find('title').string if bs.find('title') else ''
             meta = bs.find('meta', {"name": "description"})
             description = meta.attrs.get('content', '') if meta else ''
-            repo_check = CheckRepository(conn(DATABASE_URL))
-            repo_check.save(id, url_code, h1, title, description)
-            flash('Страница успешно проверена', 'success')
-            return redirect(url_for('urls_get', id=id), 302)
-        else:
-            flash('Произошла ошибка при проверке', 'error')
-            return redirect(url_for('urls_get', id=id), 302)
+            return url_code, h1, title, description
+        return None
     except requests.exceptions.ConnectionError:
-        flash('Произошла ошибка при проверке', 'error')
-        return redirect(url_for('urls_get', id=id), 302)
+        return None
+    
+
+def get_normalyze_url(input_url): 
+    parsed_url = urlparse(input_url)
+    norm_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+    return norm_url
 
 
 @app.get('/')
@@ -48,7 +47,7 @@ def url_new():
 
 @app.route('/urls')
 def urls_get_all():
-    repo_url = UrlRepository(conn(DATABASE_URL))
+    repo_url = UrlRepository(get_connection(app.config['DATABASE_URL']))
     url_check_repo_all = repo_url.get_content_with_last_date()
     return render_template(
         'view.html',
@@ -62,9 +61,8 @@ def urls_post():
     if not validators.url(input_url):
         flash('Некорректный URL', 'error')
         return render_template('index.html', url=input_url), 422
-    parsed_url = urlparse(input_url)
-    norm_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-    repo_url = UrlRepository(conn(DATABASE_URL))
+    repo_url = UrlRepository(get_connection(app.config['DATABASE_URL']))
+    norm_url = get_normalyze_url(input_url)
     url_repo = repo_url.find_name(norm_url)
     if url_repo is None:
         id = repo_url.save(norm_url)
@@ -78,8 +76,8 @@ def urls_post():
         
 @app.route('/urls/<int:id>')
 def urls_get(id):
-    repo_url = UrlRepository(conn(DATABASE_URL))
-    repo_check = CheckRepository(conn(DATABASE_URL))
+    repo_url = UrlRepository(get_connection(app.config['DATABASE_URL']))
+    repo_check = CheckRepository(get_connection(app.config['DATABASE_URL']))
     url = repo_url.find_id(id)
     checks = repo_check.find_id(id)
     return render_template(
@@ -91,6 +89,13 @@ def urls_get(id):
 
 @app.route('/urls/<int:id>/checks', methods=['POST'])
 def urls_check(id):
-    repo_url = UrlRepository(conn(DATABASE_URL))
-    url = repo_url.find_id(id)['name']    
-    return analyzer(url, id)
+    repo_url = UrlRepository(get_connection(app.config['DATABASE_URL']))
+    url = repo_url.find_id(id)['name']
+    if analyzer(url) is not None:
+        url_code, h1, title, description = analyzer(url) 
+        repo_check = CheckRepository(get_connection(app.config['DATABASE_URL']))
+        repo_check.save(id, url_code, h1, title, description)
+        flash('Страница успешно проверена', 'success')
+        return redirect(url_for('urls_get', id=id), 302)
+    flash('Произошла ошибка при проверке', 'error')
+    return redirect(url_for('urls_get', id=id), 302)
